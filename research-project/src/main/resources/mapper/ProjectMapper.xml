@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.research.project.mapper.ProjectMapper">
+
+    <!-- 项目分页查询 -->
+    <select id="selectProjectPage" resultType="com.research.project.entity.Project">
+        SELECT p.*, u.name as leader_name
+        FROM project p
+        LEFT JOIN sys_user u ON p.leader_id = u.id
+        WHERE p.del_flag = 0
+        <if test="query.name != null and query.name != ''">
+            AND p.name LIKE CONCAT('%', #{query.name}, '%')
+        </if>
+        <if test="query.status != null and query.status != ''">
+            AND p.status = #{query.status}
+        </if>
+        <if test="query.leaderId != null">
+            AND p.leader_id = #{query.leaderId}
+        </if>
+        <if test="query.memberId != null">
+            AND EXISTS (
+            SELECT 1 FROM project_member pm
+            WHERE pm.project_id = p.id
+            AND pm.user_id = #{query.memberId}
+            AND pm.status = 1
+            )
+        </if>
+        <if test="query.startTimeStart != null and query.startTimeStart != ''">
+            AND p.start_time >= #{query.startTimeStart}
+        </if>
+        <if test="query.startTimeEnd != null and query.startTimeEnd != ''">
+            AND p.start_time &lt;= #{query.startTimeEnd}
+        </if>
+        ORDER BY p.create_time DESC
+    </select>
+
+    <!-- 项目详情查询 -->
+    <select id="selectProjectDetail" resultType="com.research.project.entity.Project">
+        SELECT p.*, u.name as leader_name, u.email as leader_email
+        FROM project p
+                 LEFT JOIN sys_user u ON p.leader_id = u.id
+        WHERE p.id = #{id} AND p.del_flag = 0
+    </select>
+
+    <!-- 项目统计 -->
+    <select id="selectProjectStatistics" resultType="map">
+        SELECT
+        COUNT(*) as total_projects,
+        SUM(CASE WHEN status = 'INIT' THEN 1 ELSE 0 END) as init_count,
+        SUM(CASE WHEN status = 'PROCESSING' THEN 1 ELSE 0 END) as processing_count,
+        SUM(CASE WHEN status = 'COMPLETED' THEN 1 ELSE 0 END) as completed_count,
+        AVG(progress) as avg_progress
+        FROM project
+        WHERE del_flag = 0
+        <if test="leaderId != null">
+            AND leader_id = #{leaderId}
+        </if>
+    </select>
+</mapper>
