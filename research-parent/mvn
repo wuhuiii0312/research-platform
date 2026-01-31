@@ -1,0 +1,188 @@
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective settings
+[WARNING] Unrecognised tag: 'mirror' (position: START_TAG seen ...mirror external repositories initially using HTTP.</name>\n<mirror>... @164:9)  @ C:\apache-maven-3.9.12\conf\settings.xml, line 164, column 9
+[WARNING] 
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.research:research-common:jar:1.0.0
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.baomidou:mybatis-plus-boot-starter:jar -> version (?) vs 3.5.3.1 @ line 103, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] 科研协作平台父工程                                                          [pom]
+[INFO] 公共模块                                                               [jar]
+[INFO] research-gateway                                                   [jar]
+[INFO] 认证服务                                                               [jar]
+[INFO] research-project                                                   [jar]
+[INFO] research-task                                                      [jar]
+[INFO] research-document                                                  [jar]
+[INFO] research-search                                                    [jar]
+[INFO] research-notification                                              [jar]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/maven-metadata.xml
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/maven-metadata.xml
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/maven-metadata.xml
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/maven-metadata.xml
+Progress (1): 250 BProgress (2): 250 B | 241 BProgress (3): 250 B | 241 B | 235 BProgress (4): 250 B | 241 B | 235 B | 399 B                                           Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/maven-metadata.xml (235 B at 636 B/s)
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/maven-metadata.xml (241 B at 651 B/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/maven-metadata.xml
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/liquibase/maven-metadata.xml
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/maven-metadata.xml (250 B at 675 B/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/springframework/boot/maven-metadata.xml
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/maven-metadata.xml (399 B at 1.1 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-metadata.xml
+Progress (1): 7.3/10 kBProgress (1): 10 kB    Progress (2): 10 kB | 394 BProgress (3): 10 kB | 394 B | 250 BProgress (4): 10 kB | 394 B | 250 B | 376 B                                           Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/liquibase/maven-metadata.xml (394 B at 4.6 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/maven-metadata.xml
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-metadata.xml (10 kB at 116 kB/s)
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/springframework/boot/maven-metadata.xml (250 B at 2.4 kB/s)
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/maven-metadata.xml (376 B at 3.1 kB/s)
+Progress (1): 7.3/21 kBProgress (1): 15/21 kB Progress (1): 21 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/maven-metadata.xml (21 kB at 142 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/build-helper-maven-plugin/3.3.0/build-helper-maven-plugin-3.3.0.pom
+Progress (1): 7.3/7.4 kBProgress (1): 7.4 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/build-helper-maven-plugin/3.3.0/build-helper-maven-plugin-3.3.0.pom (7.4 kB at 95 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/mojo-parent/65/mojo-parent-65.pom
+Progress (1): 3.4/35 kBProgress (1): 12/35 kB Progress (1): 15/35 kBProgress (1): 21/35 kBProgress (1): 24/35 kBProgress (1): 25/35 kBProgress (1): 30/35 kBProgress (1): 34/35 kBProgress (1): 35 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/mojo-parent/65/mojo-parent-65.pom (35 kB at 358 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/junit/junit-bom/5.8.1/junit-bom-5.8.1.pom
+Progress (1): 5.6 kB                    Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/junit/junit-bom/5.8.1/junit-bom-5.8.1.pom (5.6 kB at 76 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/build-helper-maven-plugin/3.3.0/build-helper-maven-plugin-3.3.0.jar
+Progress (1): 3.4/68 kBProgress (1): 20/68 kB Progress (1): 36/68 kBProgress (1): 53/68 kBProgress (1): 68 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/build-helper-maven-plugin/3.3.0/build-helper-maven-plugin-3.3.0.jar (68 kB at 670 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/flyway-maven-plugin/8.5.13/flyway-maven-plugin-8.5.13.pom
+Progress (1): 1.9/4.7 kBProgress (1): 4.7 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/flyway-maven-plugin/8.5.13/flyway-maven-plugin-8.5.13.pom (4.7 kB at 60 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/flyway-parent/8.5.13/flyway-parent-8.5.13.pom
+Progress (1): 3.4/31 kBProgress (1): 20/31 kB Progress (1): 31 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/flyway-parent/8.5.13/flyway-parent-8.5.13.pom (31 kB at 325 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/flyway-maven-plugin/8.5.13/flyway-maven-plugin-8.5.13.jar
+Progress (1): 7.3/130 kBProgress (1): 7.8/130 kBProgress (1): 24/130 kB Progress (1): 41/130 kBProgress (1): 57/130 kBProgress (1): 73/130 kBProgress (1): 90/130 kBProgress (1): 106/130 kBProgress (1): 122/130 kBProgress (1): 130 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/flywaydb/flyway-maven-plugin/8.5.13/flyway-maven-plugin-8.5.13.jar (130 kB at 1.1 MB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/git-commit-id-plugin/4.9.10/git-commit-id-plugin-4.9.10.pom
+Progress (1): 6.3/12 kBProgress (1): 12 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/git-commit-id-plugin/4.9.10/git-commit-id-plugin-4.9.10.pom (12 kB at 120 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/git-commit-id-plugin-parent/4.9.10/git-commit-id-plugin-parent-4.9.10.pom
+Progress (1): 3.4/12 kBProgress (1): 12 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/git-commit-id-plugin-parent/4.9.10/git-commit-id-plugin-parent-4.9.10.pom (12 kB at 148 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/git-commit-id-plugin/4.9.10/git-commit-id-plugin-4.9.10.jar
+Progress (1): 4.9/40 kBProgress (1): 21/40 kB Progress (1): 38/40 kBProgress (1): 40 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/pl/project13/maven/git-commit-id-plugin/4.9.10/git-commit-id-plugin-4.9.10.jar (40 kB at 114 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/johnzon-maven-plugin/1.2.21/johnzon-maven-plugin-1.2.21.pom
+Progress (1): 4.7 kB                    Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/johnzon-maven-plugin/1.2.21/johnzon-maven-plugin-1.2.21.pom (4.7 kB at 44 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/johnzon/1.2.21/johnzon-1.2.21.pom
+Progress (1): 7.3/31 kBProgress (1): 16/31 kB Progress (1): 31 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/johnzon/1.2.21/johnzon-1.2.21.pom (31 kB at 207 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/johnzon-maven-plugin/1.2.21/johnzon-maven-plugin-1.2.21.jar
+Progress (1): 4.9/35 kBProgress (1): 21/35 kB Progress (1): 32/35 kBProgress (1): 35 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/johnzon/johnzon-maven-plugin/1.2.21/johnzon-maven-plugin-1.2.21.jar (35 kB at 91 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/jooq-codegen-maven/3.14.16/jooq-codegen-maven-3.14.16.pom
+Progress (1): 4.1 kB                    Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/jooq-codegen-maven/3.14.16/jooq-codegen-maven-3.14.16.pom (4.1 kB at 56 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/jooq-parent/3.14.16/jooq-parent-3.14.16.pom
+Progress (1): 7.3/28 kBProgress (1): 16/28 kB Progress (1): 28 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/jooq-parent/3.14.16/jooq-parent-3.14.16.pom (28 kB at 309 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/jooq-codegen-maven/3.14.16/jooq-codegen-maven-3.14.16.jar
+Progress (1): 7.3/17 kBProgress (1): 16/17 kB Progress (1): 17 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jooq/jooq-codegen-maven/3.14.16/jooq-codegen-maven-3.14.16.jar (17 kB at 81 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/kotlin-maven-plugin/1.6.21/kotlin-maven-plugin-1.6.21.pom
+Progress (1): 5.9 kB                    Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/kotlin-maven-plugin/1.6.21/kotlin-maven-plugin-1.6.21.pom (5.9 kB at 55 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/kotlin-project/1.6.21/kotlin-project-1.6.21.pom
+Progress (1): 3.4/10 kBProgress (1): 10 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/kotlin-project/1.6.21/kotlin-project-1.6.21.pom (10 kB at 114 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/kotlin-maven-plugin/1.6.21/kotlin-maven-plugin-1.6.21.jar
+Progress (1): 7.3/80 kBProgress (1): 16/80 kB Progress (1): 32/80 kBProgress (1): 48/80 kBProgress (1): 65/80 kBProgress (1): 80 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/jetbrains/kotlin/kotlin-maven-plugin/1.6.21/kotlin-maven-plugin-1.6.21.jar (80 kB at 741 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/liquibase/liquibase-maven-plugin/4.9.1/liquibase-maven-plugin-4.9.1.pom
+Progress (1): 1.9/2.7 kBProgress (1): 2.7 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/liquibase/liquibase-maven-plugin/4.9.1/liquibase-maven-plugin-4.9.1.pom (2.7 kB at 32 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/liquibase/liquibase-maven-plugin/4.9.1/liquibase-maven-plugin-4.9.1.jar
+Progress (1): 7.3/108 kBProgress (1): 15/108 kB Progress (1): 32/108 kBProgress (1): 48/108 kBProgress (1): 65/108 kBProgress (1): 81/108 kBProgress (1): 97/108 kBProgress (1): 108 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/liquibase/liquibase-maven-plugin/4.9.1/liquibase-maven-plugin-4.9.1.jar (108 kB at 785 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-antrun-plugin/3.0.0/maven-antrun-plugin-3.0.0.pom
+Progress (1): 4.7 kB                    Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-antrun-plugin/3.0.0/maven-antrun-plugin-3.0.0.pom (4.7 kB at 60 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-antrun-plugin/3.0.0/maven-antrun-plugin-3.0.0.jar
+Progress (1): 1.9/39 kBProgress (1): 18/39 kB Progress (1): 35/39 kBProgress (1): 39 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-antrun-plugin/3.0.0/maven-antrun-plugin-3.0.0.jar (39 kB at 110 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-assembly-plugin/3.3.0/maven-assembly-plugin-3.3.0.pom
+Progress (1): 3.4/16 kBProgress (1): 16 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-assembly-plugin/3.3.0/maven-assembly-plugin-3.3.0.pom (16 kB at 183 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-assembly-plugin/3.3.0/maven-assembly-plugin-3.3.0.jar
+Progress (1): 7.3/242 kBProgress (1): 16/242 kB Progress (1): 32/242 kBProgress (1): 48/242 kBProgress (1): 65/242 kBProgress (1): 81/242 kBProgress (1): 97/242 kBProgress (1): 114/242 kBProgress (1): 130/242 kBProgress (1): 146/242 kBProgress (1): 163/242 kBProgress (1): 179/242 kBProgress (1): 196/242 kBProgress (1): 212/242 kBProgress (1): 228/242 kBProgress (1): 242 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-assembly-plugin/3.3.0/maven-assembly-plugin-3.3.0.jar (242 kB at 581 kB/s)
+[INFO] Artifact org.apache.maven.plugins:maven-dependency-plugin:pom:3.3.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-dependency-plugin:pom:3.3.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-dependency-plugin/3.3.0/maven-dependency-plugin-3.3.0.pom
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-dependency-plugin/3.3.0/maven-dependency-plugin-3.3.0.pom (0 B at 0 B/s)
+[INFO] Artifact org.apache.maven.plugins:maven-dependency-plugin:jar:3.3.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-dependency-plugin:jar:3.3.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-dependency-plugin/3.3.0/maven-dependency-plugin-3.3.0.jar
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-dependency-plugin/3.3.0/maven-dependency-plugin-3.3.0.jar (0 B at 0 B/s)
+[INFO] Artifact org.apache.maven.plugins:maven-release-plugin:pom:3.0.1 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-release-plugin:pom:3.0.1 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-release-plugin/3.0.1/maven-release-plugin-3.0.1.pom
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-release-plugin/3.0.1/maven-release-plugin-3.0.1.pom (0 B at 0 B/s)
+[INFO] Artifact org.apache.maven.release:maven-release:pom:3.0.1 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.release:maven-release:pom:3.0.1 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/release/maven-release/3.0.1/maven-release-3.0.1.pom
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/release/maven-release/3.0.1/maven-release-3.0.1.pom (0 B at 0 B/s)
+[INFO] Artifact org.apache.maven.plugins:maven-release-plugin:jar:3.0.1 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-release-plugin:jar:3.0.1 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-release-plugin/3.0.1/maven-release-plugin-3.0.1.jar
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-release-plugin/3.0.1/maven-release-plugin-3.0.1.jar (0 B at 0 B/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-enforcer-plugin/3.0.0/maven-enforcer-plugin-3.0.0.pom
+Progress (1): 7.3/7.7 kBProgress (1): 7.7 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-enforcer-plugin/3.0.0/maven-enforcer-plugin-3.0.0.pom (7.7 kB at 103 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/enforcer/enforcer/3.0.0/enforcer-3.0.0.pom
+Progress (1): 7.3/8.7 kBProgress (1): 7.8/8.7 kBProgress (1): 8.7 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/enforcer/enforcer/3.0.0/enforcer-3.0.0.pom (8.7 kB at 99 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-enforcer-plugin/3.0.0/maven-enforcer-plugin-3.0.0.jar
+Progress (1): 3.4/27 kBProgress (1): 20/27 kB Progress (1): 21/27 kBProgress (1): 27 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-enforcer-plugin/3.0.0/maven-enforcer-plugin-3.0.0.jar (27 kB at 98 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-failsafe-plugin/2.22.2/maven-failsafe-plugin-2.22.2.pom
+Progress (1): 1.9/12 kBProgress (1): 12 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-failsafe-plugin/2.22.2/maven-failsafe-plugin-2.22.2.pom (12 kB at 147 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-failsafe-plugin/2.22.2/maven-failsafe-plugin-2.22.2.jar
+Progress (1): 0.5/294 kBProgress (1): 17/294 kB Progress (1): 33/294 kBProgress (1): 50/294 kBProgress (1): 66/294 kBProgress (1): 82/294 kBProgress (1): 99/294 kBProgress (1): 115/294 kBProgress (1): 132/294 kBProgress (1): 148/294 kBProgress (1): 164/294 kBProgress (1): 181/294 kBProgress (1): 197/294 kBProgress (1): 213/294 kBProgress (1): 230/294 kBProgress (1): 246/294 kBProgress (1): 263/294 kBProgress (1): 279/294 kBProgress (1): 294 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-failsafe-plugin/2.22.2/maven-failsafe-plugin-2.22.2.jar (294 kB at 1.9 MB/s)
+[INFO] Artifact org.apache.maven.plugins:maven-help-plugin:pom:3.2.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-help-plugin:pom:3.2.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-help-plugin/3.2.0/maven-help-plugin-3.2.0.pom
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-help-plugin/3.2.0/maven-help-plugin-3.2.0.pom (0 B at 0 B/s)
+[INFO] Artifact org.apache.maven.plugins:maven-plugins:pom:33 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-plugins:pom:33 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-plugins/33/maven-plugins-33.pom
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-plugins/33/maven-plugins-33.pom (0 B at 0 B/s)
+[INFO] Artifact org.apache.maven.plugins:maven-help-plugin:jar:3.2.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+[INFO] Artifact org.apache.maven.plugins:maven-help-plugin:jar:3.2.0 is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from [aliyunmaven (https://maven.aliyun.com/repository/public, default, releases)]
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-help-plugin/3.2.0/maven-help-plugin-3.2.0.jar
+Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-help-plugin/3.2.0/maven-help-plugin-3.2.0.jar (0 B at 0 B/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-invoker-plugin/3.2.2/maven-invoker-plugin-3.2.2.pom
+Progress (1): 7.3/15 kBProgress (1): 14/15 kB Progress (1): 15 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-invoker-plugin/3.2.2/maven-invoker-plugin-3.2.2.pom (15 kB at 114 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-invoker-plugin/3.2.2/maven-invoker-plugin-3.2.2.jar
+Progress (1): 7.3/129 kBProgress (1): 7.8/129 kBProgress (1): 24/129 kB Progress (1): 41/129 kBProgress (1): 52/129 kBProgress (1): 56/129 kBProgress (1): 63/129 kBProgress (1): 78/129 kBProgress (1): 85/129 kBProgress (1): 102/129 kBProgress (1): 110/129 kBProgress (1): 116/129 kBProgress (1): 123/129 kBProgress (1): 129 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-invoker-plugin/3.2.2/maven-invoker-plugin-3.2.2.jar (129 kB at 1.2 MB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-javadoc-plugin/3.4.1/maven-javadoc-plugin-3.4.1.pom
+Progress (1): 7.3/21 kBProgress (1): 16/21 kB Progress (1): 21 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-javadoc-plugin/3.4.1/maven-javadoc-plugin-3.4.1.pom (21 kB at 240 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-javadoc-plugin/3.4.1/maven-javadoc-plugin-3.4.1.jar
+Progress (1): 0.5/523 kBProgress (1): 17/523 kB Progress (1): 33/523 kBProgress (1): 50/523 kBProgress (1): 66/523 kBProgress (1): 82/523 kBProgress (1): 99/523 kBProgress (1): 115/523 kBProgress (1): 132/523 kBProgress (1): 148/523 kBProgress (1): 164/523 kBProgress (1): 181/523 kBProgress (1): 197/523 kBProgress (1): 213/523 kBProgress (1): 230/523 kBProgress (1): 246/523 kBProgress (1): 263/523 kBProgress (1): 279/523 kBProgress (1): 295/523 kBProgress (1): 312/523 kBProgress (1): 328/523 kBProgress (1): 345/523 kBProgress (1): 361/523 kBProgress (1): 377/523 kBProgress (1): 394/523 kBProgress (1): 410/523 kBProgress (1): 426/523 kBProgress (1): 443/523 kBProgress (1): 459/523 kBProgress (1): 476/523 kBProgress (1): 492/523 kBProgress (1): 508/523 kBProgress (1): 523 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-javadoc-plugin/3.4.1/maven-javadoc-plugin-3.4.1.jar (523 kB at 3.0 MB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-shade-plugin/3.3.0/maven-shade-plugin-3.3.0.pom
+Progress (1): 3.4/13 kBProgress (1): 13 kB                       Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-shade-plugin/3.3.0/maven-shade-plugin-3.3.0.pom (13 kB at 163 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-shade-plugin/3.3.0/maven-shade-plugin-3.3.0.jar
+Progress (1): 7.3/141 kBProgress (1): 16/141 kB Progress (1): 18/141 kBProgress (1): 28/141 kBProgress (1): 38/141 kBProgress (1): 55/141 kBProgress (1): 71/141 kBProgress (1): 88/141 kBProgress (1): 104/141 kBProgress (1): 110/141 kBProgress (1): 113/141 kBProgress (1): 129/141 kBProgress (1): 138/141 kBProgress (1): 139/141 kBProgress (1): 141 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-shade-plugin/3.3.0/maven-shade-plugin-3.3.0.jar (141 kB at 1.3 MB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-source-plugin/3.2.1/maven-source-plugin-3.2.1.pom
+Progress (1): 1.9/6.9 kBProgress (1): 6.9 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-source-plugin/3.2.1/maven-source-plugin-3.2.1.pom (6.9 kB at 74 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-source-plugin/3.2.1/maven-source-plugin-3.2.1.jar
+Progress (1): 1.9/32 kBProgress (1): 18/32 kB Progress (1): 32 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-source-plugin/3.2.1/maven-source-plugin-3.2.1.jar (32 kB at 103 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-war-plugin/3.3.2/maven-war-plugin-3.3.2.pom
+Progress (1): 7.3/9.7 kBProgress (1): 9.7 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-war-plugin/3.3.2/maven-war-plugin-3.3.2.pom (9.7 kB at 106 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-war-plugin/3.3.2/maven-war-plugin-3.3.2.jar
+Progress (1): 1.9/83 kBProgress (1): 18/83 kB Progress (1): 35/83 kBProgress (1): 37/83 kBProgress (1): 40/83 kBProgress (1): 50/83 kBProgress (1): 66/83 kBProgress (1): 78/83 kBProgress (1): 83 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/apache/maven/plugins/maven-war-plugin/3.3.2/maven-war-plugin-3.3.2.jar (83 kB at 859 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/versions-maven-plugin/2.10.0/versions-maven-plugin-2.10.0.pom
+Progress (1): 7.3/16 kBProgress (1): 16/16 kB Progress (1): 16 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/versions-maven-plugin/2.10.0/versions-maven-plugin-2.10.0.pom (16 kB at 175 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/versions-maven-plugin/2.10.0/versions-maven-plugin-2.10.0.jar
+Progress (1): 0.4/316 kBProgress (1): 17/316 kB Progress (1): 33/316 kBProgress (1): 50/316 kBProgress (1): 66/316 kBProgress (1): 82/316 kBProgress (1): 99/316 kBProgress (1): 115/316 kBProgress (1): 132/316 kBProgress (1): 148/316 kBProgress (1): 164/316 kBProgress (1): 181/316 kBProgress (1): 197/316 kBProgress (1): 213/316 kBProgress (1): 230/316 kBProgress (1): 246/316 kBProgress (1): 247/316 kBProgress (1): 254/316 kBProgress (1): 263/316 kBProgress (1): 271/316 kBProgress (1): 273/316 kBProgress (1): 281/316 kBProgress (1): 285/316 kBProgress (1): 287/316 kBProgress (1): 290/316 kBProgress (1): 291/316 kBProgress (1): 292/316 kBProgress (1): 294/316 kBProgress (1): 304/316 kBProgress (1): 313/316 kBProgress (1): 316 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/versions-maven-plugin/2.10.0/versions-maven-plugin-2.10.0.jar (316 kB at 2.3 MB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/xml-maven-plugin/1.0.2/xml-maven-plugin-1.0.2.pom
+Progress (1): 3.4/8.6 kBProgress (1): 8.6 kB                        Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/xml-maven-plugin/1.0.2/xml-maven-plugin-1.0.2.pom (8.6 kB at 83 kB/s)
+Downloading from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/xml-maven-plugin/1.0.2/xml-maven-plugin-1.0.2.jar
+Progress (1): 7.3/64 kBProgress (1): 7.8/64 kBProgress (1): 24/64 kB Progress (1): 41/64 kBProgress (1): 57/64 kBProgress (1): 64 kB                      Downloaded from aliyunmaven: https://maven.aliyun.com/repository/public/org/codehaus/mojo/xml-maven-plugin/1.0.2/xml-maven-plugin-1.0.2.jar (64 kB at 685 kB/s)
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] 科研协作平台父工程 1.0.0 .................................... SKIPPED
+[INFO] 公共模块 1.0.0 ......................................... SKIPPED
+[INFO] research-gateway 1.0.0 ............................. SKIPPED
+[INFO] 认证服务 1.0.0 ......................................... SKIPPED
+[INFO] research-project 1.0-SNAPSHOT ...................... SKIPPED
+[INFO] research-task 1.0-SNAPSHOT ......................... SKIPPED
+[INFO] research-document 1.0-SNAPSHOT ..................... SKIPPED
+[INFO] research-search 1.0-SNAPSHOT ....................... SKIPPED
+[INFO] research-notification 1.0-SNAPSHOT ................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  12.208 s
+[INFO] Finished at: 2026-01-31T13:14:09+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] No plugin found for prefix 'D' in the current project and in the plugin groups [org.flywaydb, pl.project13.maven, org.apache.johnzon, org.jooq, org.jetbrains.kotlin, org.liquibase, org.springframework.boot, org.apache.maven.plugins, org.codehaus.mojo] available from the repositories [local (C:\Users\HP193\.m2\repository), aliyunmaven (https://maven.aliyun.com/repository/public)] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/NoPluginFoundForPrefixException
