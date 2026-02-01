@@ -76,37 +76,3 @@ class TreeEntity extends BaseEntity {
      */
     private Integer orderNum;
 }
-
-/**
- * 分页查询参数基类
- */
-@Data
-class PageParam {
-    /**
-     * 当前页
-     */
-    private Integer pageNum = 1;
-
-    /**
-     * 每页大小
-     */
-    private Integer pageSize = 10;
-
-    /**
-     * 排序字段
-     */
-    private String orderByColumn;
-
-    /**
-     * 排序方向（asc/desc）
-     */
-    private String isAsc = "asc";
-
-    public Integer getPageNum() {
-        return pageNum == null || pageNum <= 0 ? 1 : pageNum;
-    }
-
-    public Integer getPageSize() {
-        return pageSize == null || pageSize <= 0 ? 10 : pageSize;
-    }
-}

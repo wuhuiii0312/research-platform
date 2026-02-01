@@ -5,23 +5,47 @@
     <!-- 继承父工程 -->
     <parent>
         <groupId>com.research</groupId>
-        <artifactId>research-platform</artifactId>
+        <artifactId>research-parent</artifactId>
         <version>1.0.0</version>
+        <relativePath>../research-parent/pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>research-gateway</artifactId>
+    <name>research-gateway</name>
+    <description>网关服务</description>
 
     <dependencies>
-        <!-- 依赖common模块 -->
+        <!-- 依赖 common 模块（排除 Servlet 相关，避免与 WebFlux 冲突） -->
         <dependency>
             <groupId>com.research</groupId>
             <artifactId>research-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Spring Cloud Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <!-- Nacos 服务发现（lb:// 路由依赖） -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!-- Guava（RateLimitFilter 使用 RateLimiter） -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.1.3-jre</version>
         </dependency>
         <!-- Lombok -->
         <dependency>

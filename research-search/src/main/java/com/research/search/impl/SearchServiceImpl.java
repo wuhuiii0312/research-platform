@@ -97,7 +97,7 @@ public class SearchServiceImpl implements SearchService {
 
         } catch (IOException e) {
             log.error("搜索文档失败: {}", e.getMessage());
-            return CommonResult.failed("搜索失败");
+            return CommonResult.fail(500, "搜索失败");
         }
     }
 
@@ -141,7 +141,7 @@ public class SearchServiceImpl implements SearchService {
 
         } catch (IOException e) {
             log.error("搜索任务失败: {}", e.getMessage());
-            return CommonResult.failed("搜索失败");
+            return CommonResult.fail(500, "搜索失败");
         }
     }
 
@@ -175,7 +175,7 @@ public class SearchServiceImpl implements SearchService {
 
         } catch (IOException e) {
             log.error("搜索用户失败: {}", e.getMessage());
-            return CommonResult.failed("搜索失败");
+            return CommonResult.fail(500, "搜索失败");
         }
     }
 
@@ -201,7 +201,7 @@ public class SearchServiceImpl implements SearchService {
             return CommonResult.success("索引重建成功");
         } catch (Exception e) {
             log.error("重建索引失败: {}", e.getMessage());
-            return CommonResult.failed("索引重建失败");
+            return CommonResult.fail(500, "索引重建失败");
         }
     }
 

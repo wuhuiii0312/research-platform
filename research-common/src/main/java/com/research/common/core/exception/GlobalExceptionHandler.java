@@ -55,13 +55,10 @@ public class GlobalExceptionHandler {
         return request.getContextPath();
     }
 
-    // 业务异常处理（可选）
-    /*
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonResult<String> handleBusinessException(BusinessException e) {
-        log.error("业务异常：", e);
-        return CommonResult.fail(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        log.warn("业务异常：{}", e.getMessage());
+        return CommonResult.fail(e.getCode() != null ? e.getCode() : HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
-    */
 }

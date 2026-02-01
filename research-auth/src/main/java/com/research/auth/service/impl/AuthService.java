@@ -55,19 +55,3 @@ public interface AuthService extends IService<User> {
      */
     LoginUser getLoginUser();
 }
-
-/**
- * 登录用户信息
- */
-@Data
-class LoginUser {
-    private Long userId;
-    private String username;
-    private String name;
-    private String avatar;
-    private List<String> roles;
-    private List<String> permissions;
-    private String token;
-    private LocalDateTime loginTime;
-    private LocalDateTime expireTime;
-}

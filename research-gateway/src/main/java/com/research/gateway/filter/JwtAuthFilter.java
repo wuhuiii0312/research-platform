@@ -101,14 +101,22 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     }
 
     /**
-     * 跳过认证的路径
+     * 跳过认证的路径（与网关路由 /api/auth/** 对应）
      */
     private boolean skipAuth(String path) {
         return path.startsWith("/swagger-ui/")
                 || path.startsWith("/v3/api-docs/")
                 || path.startsWith("/actuator/health")
-                || path.equals("/user/login")
-                || path.equals("/user/register");
+                || path.equals("/api/auth/login")
+                || path.equals("/api/auth/register")
+                || path.equals("/api/auth/captcha")
+                || path.startsWith("/api/auth/login")
+                || path.startsWith("/api/auth/register")
+                || path.startsWith("/api/auth/captcha")
+                || path.equals("/api/user/login")
+                || path.startsWith("/api/user/login")
+                || path.startsWith("/api/user/register")
+                || path.startsWith("/api/user/captcha");
     }
 
     @Override

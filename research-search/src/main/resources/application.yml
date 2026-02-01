@@ -1,0 +1,19 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: research-search
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8080
+        namespace: public
+
+jwt:
+  secret: project-secret-key-1234567890
+  expire: 7200
+
+logging:
+  level:
+    com.research.search: debug

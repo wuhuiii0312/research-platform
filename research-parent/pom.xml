@@ -13,11 +13,12 @@
     <name>科研协作平台父工程</name>
     <description>基于SpringCloud+Vue的科研协作平台</description>
 
-    <!-- 子模块 -->
+    <!-- 子模块（与根 pom 的 modules 对应，便于从父工程 mvn install） -->
     <modules>
         <module>../research-common</module>
         <module>../research-gateway</module>
         <module>../research-auth</module>
+        <module>../research-user</module>
         <module>../research-project</module>
         <module>../research-task</module>
         <module>../research-document</module>
@@ -70,6 +71,9 @@
 
         <!-- 测试 -->
         <junit.version>5.9.3</junit.version>
+
+        <!-- Swagger 2（与 Spring Boot 2.7 兼容） -->
+        <swagger2.version>2.9.2</swagger2.version>
 
         <!-- 补充Spring Boot子依赖版本（复用父版本） -->
         <spring-boot.version>2.7.18</spring-boot.version>
@@ -132,10 +136,10 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
-            <!-- MySQL -->
+            <!-- MySQL Connector/J 8.x 使用新坐标 com.mysql:mysql-connector-j -->
             <dependency>
                 <groupId>com.mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
+                <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
 
@@ -193,6 +197,37 @@
                 <artifactId>junit-jupiter</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!-- 本平台子模块统一版本（子模块可省略 version） -->
+            <dependency>
+                <groupId>com.research</groupId>
+                <artifactId>research-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Swagger 2（适配 Spring Boot 2.7 + JDK 17，提供 @Api、@ApiOperation） -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+
+            <!-- Bean Validation（javax.validation.constraints，适配 Spring Boot 2.7 + JDK 17） -->
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>2.0.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>6.2.5.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

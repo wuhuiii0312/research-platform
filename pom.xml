@@ -10,18 +10,21 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <!-- 子模块 -->
+    <!-- 仅聚合 research-parent，由 research-parent 的 <modules> 定义子模块，避免 reactor 中 research-common 等重复 -->
     <modules>
-        <module>research-common</module>
-        <module>research-gateway</module>
+        <module>research-parent</module>
     </modules>
 
-    <!-- 统一依赖版本 -->
+    <!-- 统一依赖版本与编码（与 research-parent 一致，Java 17） -->
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-cloud.version>2021.0.8</spring-cloud.version>
+        <lombok.version>1.18.30</lombok.version>
+        <mysql.version>8.0.33</mysql.version>
     </properties>
 
     <!-- 依赖管理 -->
@@ -43,7 +46,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- 子模块依赖 -->
+            <!-- 子模块依赖（MySQL 由 research-parent 统一管理为 com.mysql:mysql-connector-j） -->
             <dependency>
                 <groupId>com.research</groupId>
                 <artifactId>research-common</artifactId>
@@ -51,4 +54,26 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

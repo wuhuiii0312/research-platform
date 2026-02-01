@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  * 认证控制器
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping({"/auth", "/user"})  // 网关 /api/auth 与 /api/user 均转发到此服务
 @Api(tags = "认证管理")
 public class AuthController {
 

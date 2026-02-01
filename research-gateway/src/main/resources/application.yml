@@ -1,0 +1,97 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: research-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8080
+        namespace: public
+        group: DEFAULT_GROUP
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: research-auth
+          uri: lb://research-auth
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+              args:
+                ignorePaths: /api/auth/login,/api/auth/captcha,/api/auth/register,/api/user/login
+
+        - id: research-user
+          uri: lb://research-user
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+              args:
+                ignorePaths: /api/user/login,/api/user/register
+
+        - id: research-project
+          uri: lb://research-project
+          predicates:
+            - Path=/api/project/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+
+        - id: research-task
+          uri: lb://research-task
+          predicates:
+            - Path=/api/task/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+
+        - id: research-document
+          uri: lb://research-document
+          predicates:
+            - Path=/api/document/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+
+      default-filters:
+        - name: RateLimitFilter
+          args:
+            capacity: 100
+            refillTokens: 10
+            refillDuration: 1
+
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+    database: 0
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 10
+        min-idle: 0
+
+jwt:
+  secret: project-secret-key-1234567890
+  expire: 7200
+
+logging:
+  level:
+    com.research.gateway: info
+    org.springframework.cloud.gateway: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

@@ -1,0 +1,14 @@
+<!--
+  用法：将 <mirrors>...</mirrors> 整段复制到 Maven settings.xml 中，替换原有 <mirrors> 段。
+  路径示例：C:\apache-maven-3.9.12\conf\settings.xml
+  要求：<mirrors> 必须为 <settings> 的直接子节点，且 <mirror> 必须为 <mirrors> 的直接子节点，不可嵌套在 <repository> 等内部。
+  若报「Unrecognised tag: 'mirror'」或 PITarget 保留字错误，多为 <mirror> 写在了错误位置（如 <profiles><repository> 内），请按此结构修正。
+-->
+<mirrors>
+    <mirror>
+        <id>aliyunmaven</id>
+        <mirrorOf>*</mirrorOf>
+        <name>阿里云公共仓库</name>
+        <url>https://maven.aliyun.com/repository/public</url>
+    </mirror>
+</mirrors>

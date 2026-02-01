@@ -17,8 +17,8 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    // Token过期时间：2小时（毫秒）
-    @Value("${jwt.expire:7200000}")
+    // Token 过期时间：单位秒，如 7200=2 小时（内部会乘以 1000 转为毫秒）
+    @Value("${jwt.expire:7200}")
     private long expire;
 
     // JWT密钥（和网关一致）
@@ -41,7 +41,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .setClaims(claims)  // 自定义载荷
                 .setIssuedAt(new Date())  // 签发时间
-                .setExpiration(new Date(System.currentTimeMillis() + expire))  // 过期时间
+                .setExpiration(new Date(System.currentTimeMillis() + expire * 1000))  // 过期时间：配置为秒，此处转毫秒
                 .signWith(key)  // 签名
                 .compact();
     }

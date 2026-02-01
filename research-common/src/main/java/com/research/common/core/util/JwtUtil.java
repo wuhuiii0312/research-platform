@@ -20,12 +20,20 @@ import java.util.UUID;
 @Component // 核心：注册为Spring Bean
 public class JwtUtil {
 
-    // 从配置文件读取密钥（无配置时用默认值）
+    // 从配置文件读取密钥（无配置时用默认值）；支持 setter 便于 Gateway 等非扫描场景手动注入
     @Value("${jwt.secret:research-platform-jwt-secret-key-2026}")
     private String secret;
 
     @Value("${jwt.expire:7200}")
     private Long expire;
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public void setExpire(Long expire) {
+        this.expire = expire;
+    }
 
     // 生成JWT令牌
     public String generateToken(Map<String, Object> claims) {
