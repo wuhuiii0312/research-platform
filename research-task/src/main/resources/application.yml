@@ -4,13 +4,11 @@ server:
 spring:
   application:
     name: research-task
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/research_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://localhost:3306/research?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-
   redis:
     host: localhost
     port: 6379
@@ -22,21 +20,17 @@ spring:
         max-wait: -1ms
         max-idle: 10
         min-idle: 0
-
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: localhost:8080
         namespace: public
         group: DEFAULT_GROUP
-
-  # 文件上传配置
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
 
-# MyBatis Plus配置
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.research.task.entity
@@ -49,27 +43,16 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-# 文件上传路径
+jwt:
+  secret: project-secret-key-1234567890
+  expire: 3600
+
 file:
   upload:
     path: D:/project/uploads
 
-# Seata配置
-seata:
-  tx-service-group: research_tx_group
-  service:
-    vgroup-mapping:
-      research_tx_group: default
-    grouplist:
-      default: localhost:8091
-
-# 日志配置
 logging:
   level:
     com.research.task: debug
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
-  file:
-    name: logs/task-service.log
-    max-size: 10MB
-    max-history: 30

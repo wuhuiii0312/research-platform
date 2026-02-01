@@ -1,50 +1,44 @@
 server:
-  port: 8081  # 认证服务端口
+  port: 8081
 
 spring:
   application:
-    name: research-auth  # 服务名（网关路由用）
+    name: research-auth
   profiles:
     active: dev
-  # 数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/research_platform?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/research?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456  # 替换为实际密码
-  # Redis配置
+    password: 123456
   redis:
     host: localhost
     port: 6379
-    password:   # 无密码则留空
-    database: 1  # 认证服务用第1个库
+    password:
+    database: 1
     timeout: 5000ms
     lettuce:
       pool:
         max-active: 8
         max-idle: 8
         min-idle: 0
-  # Nacos配置
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: localhost:8080
         namespace: public
 
-# JWT配置
 jwt:
-  secret: research-platform-2025-secret-key-123456  # 和网关一致
-  expire: 7200000  # 2小时（毫秒）
+  secret: project-secret-key-1234567890
+  expire: 3600
 
-# MyBatis Plus配置
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.research.auth.domain
+  type-aliases-package: com.research.auth.entity
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-# 日志配置
 logging:
   level:
     com.research.auth: debug

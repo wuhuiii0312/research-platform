@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: research-user
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8080
+        namespace: public
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/research?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+jwt:
+  secret: project-secret-key-1234567890
+  expire: 3600
+
+logging:
+  level:
+    com.research.user: debug
