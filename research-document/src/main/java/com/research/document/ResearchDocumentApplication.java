@@ -1,5 +1,6 @@
 package com.research.document;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -9,6 +10,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  */
 @SpringBootApplication(scanBasePackages = "com.research")
 @EnableDiscoveryClient
+@MapperScan("com.research.document.mapper")
 public class ResearchDocumentApplication {
     public static void main(String[] args) {
         SpringApplication.run(ResearchDocumentApplication.class, args);

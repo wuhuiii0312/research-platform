@@ -1,2 +1,22 @@
 server:
-  port: 18081
+  port: 8081
+  servlet:
+    context-path: /  # 确保无前缀
+
+# Actuator配置（暴露所有端点，开发环境）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # 暴露所有actuator端点
+      base-path: /actuator  # 默认路径，确保正确
+  endpoint:
+    health:
+      show-details: always  # 显示健康详情
+  server:
+    port: 8081  # 和服务端口一致
+
+# 关闭Security（开发环境最简方案，彻底避免拦截）
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration

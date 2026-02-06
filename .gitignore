@@ -1,0 +1,34 @@
+# Java/SpringCloud 过滤
+target/
+*.jar
+*.war
+*.class
+.idea/
+*.iml
+out/
+logs/
+temp/
+*.log
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+# 配置文件（本地配置，不上传）
+src/main/resources/application-dev.yml
+src/main/resources/application-local.yml
+# Vue/前端 过滤
+node_modules/
+dist/
+build/
+*.env.local
+*.env.development.local
+*.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# 系统文件
+.DS_Store
+Thumbs.db
+# 缓存/临时文件
+.cache/
+temp/

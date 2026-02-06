@@ -74,6 +74,17 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <!-- 允许删除失败时继续构建 -->
+                    <failOnError>false</failOnError>
+                    <!-- 强制删除 Windows 锁定的文件 -->
+                    <force>true</force>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

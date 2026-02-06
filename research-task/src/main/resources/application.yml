@@ -1,6 +1,5 @@
 server:
-  port: 8083
-
+  port: 8088
 spring:
   application:
     name: research-task
@@ -23,14 +22,15 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8080
-        namespace: public
+        server-addr: localhost:8848  # 修正为Nacos默认端口
+        namespace: research-platform
         group: DEFAULT_GROUP
+        fail-fast: false
+        register-enabled: true  # 强制注册
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.research.task.entity
@@ -42,17 +42,15 @@ mybatis-plus:
       logic-delete-field: delFlag
       logic-delete-value: 1
       logic-not-delete-value: 0
-
 jwt:
   secret: project-secret-key-1234567890
   expire: 7200
-
 file:
   upload:
     path: D:/project/uploads
-
 logging:
   level:
     com.research.task: debug
+    com.alibaba.nacos: info
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"

@@ -74,6 +74,15 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
+        <!-- Flyway 数据迁移与测试数据清理（统一在认证服务启动时执行） -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
         <!-- Swagger 注解（版本由父工程管理） -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -89,6 +98,12 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
+    
+          <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -103,6 +118,8 @@
                 <version>2.7.18</version>
                 <configuration>
                     <mainClass>com.research.auth.ResearchAuthApplication</mainClass>
+                    <!-- 低内存配置，避免「页面文件太小」/ G1 virtual space 报错 -->
+                    <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
                 </configuration>
             </plugin>
         </plugins>

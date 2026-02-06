@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 // 注册中心注解（有就加，没有则只保留 @SpringBootApplication）
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.research")
 public class ResearchUserApplication {
     public static void main(String[] args) {
         SpringApplication.run(ResearchUserApplication.class, args);

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -191,13 +192,49 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
+    public CommonResult<?> searchPublic(String keyword, String type, Integer pageNum, Integer pageSize) {
+        if (pageNum == null) pageNum = 1;
+        if (pageSize == null) pageSize = 10;
+        try {
+            String[] indices = "result".equalsIgnoreCase(type)
+                    ? new String[]{"public_result"}
+                    : new String[]{"public_document"};
+            SearchRequest searchRequest = new SearchRequest(indices);
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                    .filter(QueryBuilders.termQuery("is_public", true))
+                    .filter(QueryBuilders.termQuery("testDataFlag", false));
+            if (StrUtil.isNotBlank(keyword)) {
+                boolQuery.must(QueryBuilders.multiMatchQuery(keyword, "title", "content", "name", "description"));
+            }
+            sourceBuilder.query(boolQuery);
+            sourceBuilder.from((pageNum - 1) * pageSize);
+            sourceBuilder.size(pageSize);
+            sourceBuilder.sort("create_time", SortOrder.DESC);
+            searchRequest.source(sourceBuilder);
+            SearchResponse response = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            List<Map<String, Object>> items = new ArrayList<>();
+            for (SearchHit hit : response.getHits().getHits()) {
+                items.add(hit.getSourceAsMap());
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("total", response.getHits().getTotalHits().value);
+            result.put("items", items);
+            result.put("pageNum", pageNum);
+            result.put("pageSize", pageSize);
+            return CommonResult.success(result);
+        } catch (IOException e) {
+            log.error("公开检索失败: {}", e.getMessage());
+            return CommonResult.fail(500, "检索失败");
+        }
+    }
+
+    @Override
     public CommonResult<?> rebuildIndex() {
         try {
-            // 重新构建所有索引
             rebuildDocumentIndex();
             rebuildTaskIndex();
             rebuildUserIndex();
-
             return CommonResult.success("索引重建成功");
         } catch (Exception e) {
             log.error("重建索引失败: {}", e.getMessage());

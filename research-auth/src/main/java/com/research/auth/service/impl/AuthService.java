@@ -11,9 +11,10 @@ import com.research.common.core.domain.CommonResult;
 public interface AuthService extends IService<User> {
 
     /**
-     * 用户登录
+     * 用户登录。管理员 admin 可任选角色；其他用户只能使用注册时的角色，否则返回「请选择正确的角色身份」
+     * 返回 data 含 token、userId、username，供前端统一存储与个人中心展示
      */
-    CommonResult<String> login(String username, String password);
+    CommonResult<?> login(String username, String password, String role);
 
     /**
      * 用户注销

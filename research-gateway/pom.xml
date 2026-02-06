@@ -36,10 +36,20 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
+        <!-- 加载 bootstrap.yml（路由等配置在 bootstrap 中） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
         <!-- Nacos 服务发现（lb:// 路由依赖） -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!-- LoadBalancer（lb:// 路由必须，否则可能缺少 ReactorLoadBalancerExchangeFilterFunction） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
         <!-- Guava（RateLimitFilter 使用 RateLimiter） -->
         <dependency>
@@ -62,6 +72,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <configuration>
+                    <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

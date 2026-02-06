@@ -7,8 +7,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8080
-        namespace: public
+        server-addr: localhost:8848
+        namespace: research-platform
+        group: DEFAULT_GROUP
+        register-enabled: true
+        fail-fast: false
 
 jwt:
   secret: project-secret-key-1234567890

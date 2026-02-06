@@ -18,4 +18,7 @@ public interface SearchService {
     CommonResult<?> getHotKeywords();
 
     CommonResult<?> rebuildIndex();
+
+    /** 公开检索（is_public=1 且 test_data_flag=false） */
+    CommonResult<?> searchPublic(String keyword, String type, Integer pageNum, Integer pageSize);
 }

@@ -1,97 +1,31 @@
 server:
-  port: 8085
+  port: 9527  # 网关端口（与步骤5验证一致；前端代理需指向此端口）
+
+# 与 research-auth 保持一致，以便网关解析 JWT 并向下游传递用户信息
+jwt:
+  secret: research-platform-jwt-secret-key-2026-abcdefghijklmn
+  expire: 7200
 
 spring:
   application:
-    name: research-gateway
+    name: research-gateway  # 必须和Nacos注册名一致
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8080
-        namespace: public
+        server-addr: localhost:8848
+        namespace: research-platform
         group: DEFAULT_GROUP
+        service: research-gateway
+        register-enabled: true
+        fail-fast: false
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
-      routes:
-        - id: research-auth
-          uri: lb://research-auth
-          predicates:
-            - Path=/api/auth/**
-          filters:
-            - StripPrefix=1
-            - name: JwtAuthFilter
-              args:
-                ignorePaths: /api/auth/login,/api/auth/captcha,/api/auth/register,/api/user/login
-
-        - id: research-user
-          uri: lb://research-user
-          predicates:
-            - Path=/api/user/**
-          filters:
-            - StripPrefix=1
-            - name: JwtAuthFilter
-              args:
-                ignorePaths: /api/user/login,/api/user/register
-
-        - id: research-project
-          uri: lb://research-project
-          predicates:
-            - Path=/api/project/**
-          filters:
-            - StripPrefix=1
-            - name: JwtAuthFilter
-
-        - id: research-task
-          uri: lb://research-task
-          predicates:
-            - Path=/api/task/**
-          filters:
-            - StripPrefix=1
-            - name: JwtAuthFilter
-
-        - id: research-document
-          uri: lb://research-document
-          predicates:
-            - Path=/api/document/**
-          filters:
-            - StripPrefix=1
-            - name: JwtAuthFilter
-
-      default-filters:
-        - name: RateLimitFilter
-          args:
-            capacity: 100
-            refillTokens: 10
-            refillDuration: 1
-
-  redis:
-    host: localhost
-    port: 6379
-    password: ""
-    database: 0
-    lettuce:
-      pool:
-        max-active: 20
-        max-idle: 10
-        min-idle: 0
-
-jwt:
-  secret: project-secret-key-1234567890
-  expire: 7200
-
+      # 路由规则见 bootstrap.yml（auth/project/task/user 等）
+# 日志配置（便于排查注册问题）
 logging:
   level:
-    com.research.gateway: info
-    org.springframework.cloud.gateway: info
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: when-authorized
+    org.springframework.cloud.gateway: debug
+    com.alibaba.nacos: info

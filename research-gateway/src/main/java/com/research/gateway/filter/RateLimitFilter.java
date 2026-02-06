@@ -34,6 +34,11 @@ public class RateLimitFilter extends AbstractGatewayFilterFactory<RateLimitFilte
             String clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
             String key = "rate_limit:" + clientIp;
 
+            // 本地开发环境放行（避免本机调试频繁触发限流）
+            if ("127.0.0.1".equals(clientIp) || "0:0:0:0:0:0:0:1".equals(clientIp)) {
+                return chain.filter(exchange);
+            }
+
             // 根据配置创建令牌桶（每秒补充refillTokens个令牌，容量capacity）
             RateLimiter rateLimiter = RATE_LIMITER_MAP.computeIfAbsent(key,
                     k -> RateLimiter.create(config.getRefillTokens(), config.getRefillDuration(), TimeUnit.SECONDS));

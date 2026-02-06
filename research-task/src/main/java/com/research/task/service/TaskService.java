@@ -20,6 +20,9 @@ public interface TaskService extends IService<Task> {
 
     CommonResult<?> deleteTask(Long id);
 
+    /** 按项目ID批量删除任务（项目解散时调用） */
+    CommonResult<?> deleteTasksByProjectId(Long projectId);
+
     CommonResult<?> getTaskDetail(Long id);
 
     CommonResult<?> assignTask(Long taskId, Long assigneeId);

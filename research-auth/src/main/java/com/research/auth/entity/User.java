@@ -56,6 +56,11 @@ public class User extends BaseEntity {
     private String avatar;
 
     /**
+     * 五位数字邀请码（注册时随机生成，供项目负责人邀请入项目）
+     */
+    private String inviteCode;
+
+    /**
      * 状态（0-禁用，1-正常）
      */
     private Integer status;
@@ -105,7 +110,7 @@ public class User extends BaseEntity {
 }
 
 /**
- * 角色实体
+ * 角色实体（非数据库表时可为 exist = false）
  */
 @Data
 @TableName("sys_role")

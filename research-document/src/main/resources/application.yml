@@ -1,14 +1,28 @@
 server:
-  port: 8084
+  port: 8099
 
+# 放宽上传限制，避免大文件上传无响应
 spring:
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true # 已有表时自动基准化，避免报错
+    clean-disabled: true # 禁止清理数据，保护已有数据
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   application:
     name: research-document
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8080
-        namespace: public
+        server-addr: localhost:8848
+        namespace: research-platform
+        group: DEFAULT_GROUP
+        register-enabled: true
+        fail-fast: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/research_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai

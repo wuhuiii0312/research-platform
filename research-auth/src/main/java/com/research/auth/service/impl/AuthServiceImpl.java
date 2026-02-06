@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +42,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Value("${jwt.expire:7200000}")
+    @Value("${jwt.expire:7200}")
     private long jwtExpire;
 
     private static final String CAPTCHA_KEY = Constants.CAPTCHA_PREFIX;
@@ -51,23 +50,51 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
     private static final int CAPTCHA_EXPIRE_MINUTES = 5;
     private static final int BLACKLIST_EXPIRE_HOURS = 24;
 
+    // 关键修改：将返回值从 CommonResult<String> 改为 CommonResult<Map<String, Object>>
     @Override
-    public CommonResult<String> login(String username, String password) {
-        if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
-            return CommonResult.fail(HttpStatus.BAD_REQUEST.value(), "用户名和密码不能为空");
+    public CommonResult<Map<String, Object>> login(String username, String password, String role) {
+        // 1) 参数校验
+        if (StrUtil.isBlank(username)) {
+            return CommonResult.fail(HttpStatus.BAD_REQUEST.value(), "用户名不能为空");
         }
+        if (StrUtil.isBlank(password)) {
+            return CommonResult.fail(HttpStatus.BAD_REQUEST.value(), "密码不能为空");
+        }
+        if (StrUtil.isBlank(role)) {
+            // 前端是“选择身份 + 用户名密码”，这里给出明确提示
+            return CommonResult.fail(HttpStatus.BAD_REQUEST.value(), "请选择登录身份");
+        }
+
+        // 2) 用户校验：先按用户名查，再区分「不存在/被禁用」
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username)
-                .eq(User::getStatus, 1));
+                .eq(User::getUsername, username));
         if (user == null) {
-            return CommonResult.fail(HttpStatus.UNAUTHORIZED.value(), "用户名或密码错误");
+            return CommonResult.fail(HttpStatus.UNAUTHORIZED.value(), "用户名不存在");
         }
+        if (user.getStatus() == null || user.getStatus() != 1) {
+            return CommonResult.fail(HttpStatus.FORBIDDEN.value(), "账号已被禁用，请联系管理员");
+        }
+
+        // 3) 密码校验
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return CommonResult.fail(HttpStatus.UNAUTHORIZED.value(), "用户名或密码错误");
+            return CommonResult.fail(HttpStatus.UNAUTHORIZED.value(), "密码错误");
         }
-        String token = jwtUtils.generateToken(user.getId(), user.getUsername());
-        log.info("用户登录成功: userId={}, username={}", user.getId(), username);
-        return CommonResult.success(token);
+
+        // 非管理员只能使用注册时的角色登录，否则提示「请选择正确的角色身份」
+        if (!Constants.ROLE_ADMIN.equalsIgnoreCase(user.getUsername())) {
+            String userRole = user.getRoleCode() != null ? user.getRoleCode().trim() : "";
+            String selectedRole = role != null ? role.trim() : "";
+            if (!selectedRole.equalsIgnoreCase(userRole)) {
+                return CommonResult.fail(HttpStatus.FORBIDDEN.value(), "请选择正确的角色身份");
+            }
+        }
+        String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getRoleCode());
+        log.info("用户登录成功: userId={}, username={}, role={}", user.getId(), username, role);
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("userId", user.getId());
+        data.put("username", user.getUsername());
+        return CommonResult.success(data); // 现在类型匹配了
     }
 
     @Override
@@ -92,6 +119,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         loginUser.setAvatar(user.getAvatar());
         loginUser.setRoles(user.getRoleCode() != null ? Collections.singletonList(user.getRoleCode()) : Collections.emptyList());
         loginUser.setPermissions(Collections.emptyList());
+        loginUser.setInviteCode(user.getInviteCode());
         return CommonResult.success(loginUser);
     }
 
@@ -106,7 +134,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
             if (user == null) {
                 return CommonResult.fail(HttpStatus.UNAUTHORIZED.value(), "用户不存在");
             }
-            String newToken = jwtUtils.generateToken(user.getId(), user.getUsername());
+            String newToken = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getRoleCode());
             return CommonResult.success(newToken);
         } catch (Exception e) {
             log.warn("刷新Token失败: {}", e.getMessage());
@@ -142,13 +170,34 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(1);
-        user.setRoleCode("user");
+        // 保留前端传入的角色：LEADER/MEMBER/VISITOR，不再覆盖为 user
+        if (user.getRoleCode() == null || user.getRoleCode().isEmpty()) {
+            user.setRoleCode("MEMBER");
+        }
         if (user.getName() == null) {
             user.setName(user.getUsername());
         }
+        // 五位数字邀请码（10000-99999），供项目负责人邀请入项目
+        String inviteCode = generateUniqueInviteCode();
+        user.setInviteCode(inviteCode);
         userMapper.insert(user);
-        log.info("用户注册成功: username={}", user.getUsername());
-        return CommonResult.success("注册成功");
+        log.info("用户注册成功: username={}, inviteCode={}", user.getUsername(), inviteCode);
+        Map<String, Object> data = new HashMap<>();
+        data.put("message", "注册成功");
+        data.put("inviteCode", inviteCode);
+        return CommonResult.success(data);
+    }
+
+    /** 生成唯一五位数字邀请码 */
+    private String generateUniqueInviteCode() {
+        Random r = new Random();
+        for (int i = 0; i < 50; i++) {
+            int n = 10000 + r.nextInt(90000);
+            String code = String.valueOf(n);
+            Long cnt = userMapper.selectCount(new LambdaQueryWrapper<User>().eq(User::getInviteCode, code));
+            if (cnt == null || cnt == 0) return code;
+        }
+        return String.valueOf(10000 + r.nextInt(90000));
     }
 
     @Override

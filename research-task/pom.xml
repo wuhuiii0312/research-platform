@@ -63,6 +63,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.research.task.TaskApplication</mainClass>
+                    <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
                 </configuration>
             </plugin>
         </plugins>

@@ -28,11 +28,12 @@ public class JwtUtils {
     /**
      * 生成Token
      */
-    public String generateToken(Long userId, String username) {
+    public String generateToken(Long userId, String username, String roleCode) {
         // 构建Claims（自定义载荷）
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
+        claims.put("roleCode", roleCode);
 
         // 生成密钥
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
@@ -44,6 +45,11 @@ public class JwtUtils {
                 .setExpiration(new Date(System.currentTimeMillis() + expire * 1000))  // 过期时间：配置为秒，此处转毫秒
                 .signWith(key)  // 签名
                 .compact();
+    }
+
+    /** 兼容旧调用：不传 roleCode 时默认 VISITOR */
+    public String generateToken(Long userId, String username) {
+        return generateToken(userId, username, "VISITOR");
     }
 
     /**

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.research.project.mapper.ProjectMemberMapper">
+
+    <select id="selectProjectIdsByUserId" resultType="java.lang.Long">
+        SELECT project_id FROM project_member
+        WHERE user_id = #{userId}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <select id="selectMembersByProjectId" resultType="com.research.project.model.ProjectMemberVO">
+        SELECT pm.user_id AS userId,
+               u.username AS username,
+               COALESCE(u.name, u.username) AS name,
+               u.invite_code AS inviteCode,
+               pm.role AS role,
+               DATE_FORMAT(pm.join_time, '%Y-%m-%d %H:%i') AS joinTime
+        FROM project_member pm
+        LEFT JOIN sys_user u ON pm.user_id = u.id
+        WHERE pm.project_id = #{projectId}
+        ORDER BY pm.join_time ASC
+    </select>
+</mapper>

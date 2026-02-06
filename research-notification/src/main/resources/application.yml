@@ -1,0 +1,29 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: research-notification
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/research_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: 123456
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: research-platform
+        group: DEFAULT_GROUP
+        register-enabled: true
+        fail-fast: false
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.research.notification.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.research.notification: debug

@@ -12,8 +12,10 @@ import java.util.Map;
 
 public interface TaskMapper extends BaseMapper<Task> {
 
-    // 分页查询任务
-    IPage<Task> selectTaskPage(Page<Task> page, @Param("query") TaskQuery query);
+    // 分页查询任务（仅当前用户参与项目的任务）
+    IPage<Task> selectTaskPage(Page<Task> page,
+                               @Param("query") TaskQuery query,
+                               @Param("userId") Long userId);
 
     // 查询任务详情
     Task selectTaskDetail(Long id);

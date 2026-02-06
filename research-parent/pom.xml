@@ -75,6 +75,15 @@
         <!-- Swagger 2（与 Spring Boot 2.7 兼容） -->
         <swagger2.version>2.9.2</swagger2.version>
 
+        <!-- Flyway 数据迁移/清理 -->
+        <flyway.version>9.22.3</flyway.version>
+        <!-- Elasticsearch Rest Client（与 Spring Boot 2.7 兼容） -->
+        <elasticsearch.version>7.17.10</elasticsearch.version>
+        <!-- Seata 分布式事务 -->
+        <seata.version>1.7.0</seata.version>
+        <!-- JODConverter（OpenOffice/LibreOffice 文档转换） -->
+        <jodconverter.version>4.4.6</jodconverter.version>
+
         <!-- 补充Spring Boot子依赖版本（复用父版本） -->
         <spring-boot.version>2.7.18</spring-boot.version>
     </properties>
@@ -229,6 +238,42 @@
                 <artifactId>hibernate-validator</artifactId>
                 <version>6.2.5.Final</version>
             </dependency>
+
+            <!-- Flyway 数据迁移与清理脚本 -->
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-mysql</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <!-- Elasticsearch Rest High Level Client -->
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+            <!-- Seata 分布式事务 -->
+            <dependency>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-spring-boot-starter</artifactId>
+                <version>${seata.version}</version>
+            </dependency>
+            <!-- Spring Cloud Alibaba Sentinel -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+            </dependency>
+            <!-- JODConverter OpenOffice/LibreOffice 文档转换 -->
+            <dependency>
+                <groupId>org.jodconverter</groupId>
+                <artifactId>jodconverter-local</artifactId>
+                <version>${jodconverter.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -258,6 +303,7 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
                     <configuration>
+                        <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
                         <excludes>
                             <exclude>
                                 <groupId>org.projectlombok</groupId>

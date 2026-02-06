@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.research.common.core.constant.Constants;
 import com.research.common.core.domain.CommonResult;
 import com.research.common.core.exception.BusinessException;
 import com.research.common.core.util.SecurityUtils;
@@ -25,6 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -46,6 +49,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
     @Value("${file.upload.path}")
     private String uploadPath;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private static final String NOTIFICATION_SERVICE_BASE = "http://research-notification";
 
     @Override
     @Transactional
@@ -84,8 +92,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
         log.info("创建任务成功: taskId={}, name={}, projectId={}",
                 task.getId(), task.getName(), task.getProjectId());
 
-        // TODO: 发送通知给相关人员
-        // sendTaskNotification(task, "CREATE");
+        // 通知被分配人（成员角色）：任务分配通知
+        if (task.getAssigneeId() != null) {
+            sendTaskAssignedNotification(task);
+        }
 
         return CommonResult.success(task);
     }
@@ -106,6 +116,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             throw new BusinessException("没有权限修改此任务");
         }
 
+        // 检查任务负责人是否发生变化
+        Long oldAssigneeId = existTask.getAssigneeId();
+        Long newAssigneeId = task.getAssigneeId();
+        boolean assigneeChanged = !Objects.equals(oldAssigneeId, newAssigneeId);
+
         // 更新任务
         task.setUpdateBy(currentUserId);
         updateById(task);
@@ -118,8 +133,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
         log.info("更新任务成功: taskId={}, name={}", task.getId(), task.getName());
 
-        // TODO: 发送通知
-        // sendTaskNotification(task, "UPDATE");
+        // 如果任务负责人发生变化且新负责人不为空，发送通知给新负责人
+        if (assigneeChanged && newAssigneeId != null) {
+            sendTaskAssignedNotification(task);
+        }
 
         return CommonResult.success(task);
     }
@@ -132,23 +149,60 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             throw new BusinessException("任务不存在");
         }
 
-        // 检查权限
+        // 检查权限：创建人或管理员可删
         Long currentUserId = SecurityUtils.getUserId();
-        if (!task.getCreateBy().equals(currentUserId) && !SecurityUtils.isAdmin()) {
+        Long createBy = task.getCreateBy();
+        boolean isCreator = createBy != null && createBy.equals(currentUserId);
+        if (!isCreator && !SecurityUtils.isAdmin()) {
             throw new BusinessException("没有权限删除此任务");
         }
 
-        // 逻辑删除
-        task.setDelFlag(1);
-        task.setUpdateBy(currentUserId);
-        updateById(task);
+        Long projectId = task.getProjectId();
+        String taskName = task.getName();
+
+        // 使用 MyBatis-Plus 逻辑删除 API（@TableLogic 字段不会被 updateById 更新，必须用 removeById）
+        boolean removed = removeById(id);
+        if (!removed) {
+            throw new BusinessException("删除失败");
+        }
 
         // 更新项目进度
-        updateProjectProgress(task.getProjectId());
+        updateProjectProgress(projectId);
 
-        log.info("删除任务成功: taskId={}, name={}", id, task.getName());
+        log.info("删除任务成功: taskId={}, name={}", id, taskName);
 
         return CommonResult.success("删除成功");
+    }
+
+    @Override
+    @Transactional
+    public CommonResult<?> deleteTasksByProjectId(Long projectId) {
+        if (projectId == null) {
+            throw new BusinessException("项目ID不能为空");
+        }
+        
+        // 查询项目下的所有任务
+        List<Task> tasks = list(new LambdaQueryWrapper<Task>()
+                .eq(Task::getProjectId, projectId)
+                .eq(Task::getDelFlag, 0));
+        
+        if (tasks == null || tasks.isEmpty()) {
+            log.info("项目下没有任务需要删除: projectId={}", projectId);
+            return CommonResult.success("删除成功");
+        }
+        
+        // 批量逻辑删除
+        Long currentUserId = SecurityUtils.getUserId();
+        int count = 0;
+        for (Task task : tasks) {
+            boolean removed = removeById(task.getId());
+            if (removed) {
+                count++;
+            }
+        }
+        
+        log.info("按项目ID批量删除任务成功: projectId={}, 删除数量={}", projectId, count);
+        return CommonResult.success("删除成功，共删除 " + count + " 个任务");
     }
 
     @Override
@@ -189,8 +243,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
         log.info("分配任务成功: taskId={}, assigneeId={}", taskId, assigneeId);
 
-        // TODO: 发送通知给被分配人
-        // sendAssignmentNotification(task, assigneeId);
+        // 发送通知给被分配人
+        sendTaskAssignedNotification(task);
 
         return CommonResult.success("分配成功");
     }
@@ -264,7 +318,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     @Override
     public CommonResult<?> getTaskList(TaskQuery query) {
         Page<Task> page = new Page<>(query.getPageNum(), query.getPageSize());
-        IPage<Task> taskPage = baseMapper.selectTaskPage(page, query);
+        Long userId = SecurityUtils.getUserId();
+        IPage<Task> taskPage = baseMapper.selectTaskPage(page, query, userId);
 
         // 转换为VO
         Page<Map<String, Object>> voPage = new Page<>();
@@ -429,16 +484,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
     @Override
     public CommonResult<TaskStatistics> getTaskStatistics(Long projectId) {
-        // TODO: 从数据库获取统计信息
-        // Map<String, Object> stats = baseMapper.selectTaskStatistics(projectId);
-
+        // TODO: 从数据库获取统计信息；当前先统一返回 0，避免出现演示数据
         TaskStatistics statistics = new TaskStatistics();
-        statistics.setTotalTasks(100);
-        statistics.setTodoCount(20);
-        statistics.setProcessingCount(50);
-        statistics.setReviewCount(10);
-        statistics.setDoneCount(20);
-        statistics.setAvgProgress(65);
+        statistics.setTotalTasks(0);
+        statistics.setTodoCount(0);
+        statistics.setProcessingCount(0);
+        statistics.setReviewCount(0);
+        statistics.setDoneCount(0);
+        statistics.setAvgProgress(0);
 
         return CommonResult.success(statistics);
     }
@@ -531,6 +584,101 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements Ta
             for (Task subTask : subTasks) {
                 setSubTasks(subTask, subTaskMap);
             }
+        }
+    }
+
+    /**
+     * 发送“任务分配”通知给成员（通过通知微服务）
+     */
+    private void sendTaskAssignedNotification(Task task) {
+        if (task.getAssigneeId() == null) {
+            log.warn("任务分配通知跳过：assigneeId为空, taskId={}", task.getId());
+            return;
+        }
+        if (restTemplate == null) {
+            log.error("任务分配通知失败：RestTemplate未注入, taskId={}, assigneeId={}", task.getId(), task.getAssigneeId());
+            return;
+        }
+        
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("targetUserIds", java.util.Collections.singletonList(task.getAssigneeId()));
+            body.put("title", "新任务分配");
+            body.put("content", "您被分配到新任务：" + task.getName());
+            body.put("bizType", "TASK");
+            body.put("bizId", task.getId());
+            body.put("projectId", task.getProjectId());
+            body.put("priority", "HIGH");
+            body.put("actionType", "VIEW_DETAIL");
+            body.put("notificationType", "TASK_ASSIGNED");
+            body.put("relatedId", String.valueOf(task.getId()));
+            body.put("relatedType", "TASK");
+            
+            String url = NOTIFICATION_SERVICE_BASE + "/internal/notification/send";
+            log.info("发送任务分配通知: taskId={}, assigneeId={}, url={}, body={}", 
+                    task.getId(), task.getAssigneeId(), url, body);
+            
+            // 设置请求头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            
+            CommonResult<?> result = restTemplate.postForObject(url, requestEntity, CommonResult.class);
+            
+            if (result != null && result.getCode() == 200) {
+                log.info("任务分配通知发送成功: taskId={}, assigneeId={}", task.getId(), task.getAssigneeId());
+            } else {
+                log.warn("任务分配通知返回异常: taskId={}, assigneeId={}, result={}", 
+                        task.getId(), task.getAssigneeId(), result);
+            }
+        } catch (org.springframework.web.client.ResourceAccessException e) {
+            // 服务发现失败，尝试直接调用本地端口
+            log.warn("服务发现调用失败，尝试直接调用: taskId={}, error={}", task.getId(), e.getMessage());
+            tryDirectCall(task);
+        } catch (Exception e) {
+            log.error("发送任务分配通知失败: taskId={}, assigneeId={}, error={}", 
+                    task.getId(), task.getAssigneeId(), e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 直接调用通知服务（备用方案，当服务发现失败时使用）
+     */
+    private void tryDirectCall(Task task) {
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("targetUserIds", java.util.Collections.singletonList(task.getAssigneeId()));
+            body.put("title", "新任务分配");
+            body.put("content", "您被分配到新任务：" + task.getName());
+            body.put("bizType", "TASK");
+            body.put("bizId", task.getId());
+            body.put("projectId", task.getProjectId());
+            body.put("priority", "HIGH");
+            body.put("actionType", "VIEW_DETAIL");
+            body.put("notificationType", "TASK_ASSIGNED");
+            body.put("relatedId", String.valueOf(task.getId()));
+            body.put("relatedType", "TASK");
+            
+            String directUrl = "http://localhost:8089/internal/notification/send";
+            log.info("直接调用通知服务: taskId={}, assigneeId={}, url={}", 
+                    task.getId(), task.getAssigneeId(), directUrl);
+            
+            // 设置请求头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            
+            CommonResult<?> result = restTemplate.postForObject(directUrl, requestEntity, CommonResult.class);
+            
+            if (result != null && result.getCode() == 200) {
+                log.info("直接调用通知服务成功: taskId={}, assigneeId={}", task.getId(), task.getAssigneeId());
+            } else {
+                log.error("直接调用通知服务返回异常: taskId={}, assigneeId={}, result={}", 
+                        task.getId(), task.getAssigneeId(), result);
+            }
+        } catch (Exception e) {
+            log.error("直接调用通知服务失败: taskId={}, assigneeId={}, error={}", 
+                    task.getId(), task.getAssigneeId(), e.getMessage(), e);
         }
     }
 

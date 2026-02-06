@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableDiscoveryClient
 @MapperScan("com.research.task.mapper")
-@ComponentScan("com.research.task")
+@ComponentScan(basePackages = "com.research")
 @EnableScheduling
 public class TaskApplication {
     public static void main(String[] args) {

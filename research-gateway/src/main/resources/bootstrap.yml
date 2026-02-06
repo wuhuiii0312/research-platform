@@ -1,20 +1,27 @@
 server:
-  port: 8085
+  port: 9527  # 网关端口（与步骤5验证一致，确保未被占用）
 
+# 放宽请求体限制，避免文档上传等 multipart 请求被截断或无响应
 spring:
+  codec:
+    max-in-memory-size: 10MB
   application:
-    name: research-gateway
+    name: research-gateway  # 必须和Nacos注册名一致
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8080
-        namespace: public
+        server-addr: localhost:8848
+        namespace: research-platform # 与 research-auth 及其他微服务一致
         group: DEFAULT_GROUP
+        service: research-gateway
+        register-enabled: true
+        fail-fast: false
         metadata:
           version: 1.0.0
       config:
-        server-addr: localhost:8080
-        namespace: public
+        enabled: false
+        server-addr: localhost:8848
+        namespace: research-platform
         group: DEFAULT_GROUP
         file-extension: yaml
         refresh-enabled: true
@@ -26,17 +33,34 @@ spring:
           lower-case-service-id: true
 
       routes:
-        # 认证服务路由
-        - id: research-auth
+        # 认证服务：/auth/** → 认证服务 /（StripPrefix=1），解决路由404
+        - id: research-auth-route
+          uri: lb://research-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                ignorePaths:
+                  - /auth/login
+                  - /auth/captcha
+                  - /auth/register
+                  - /auth/test
+                  - /auth/health
+            - StripPrefix=1
+        # 前端 /api 前缀：/api/auth/** → 认证服务 /（StripPrefix=2）
+        - id: research-auth-api
           uri: lb://research-auth
           predicates:
             - Path=/api/auth/**
           filters:
-            - StripPrefix=1
-            # 修正过滤器名称为 JwtAuthFilter（代码中类名）
             - name: JwtAuthFilter
               args:
-                ignorePaths: /api/auth/login, /api/auth/captcha, /api/auth/register
+                ignorePaths:
+                  - /api/auth/login
+                  - /api/auth/captcha
+                  - /api/auth/register
+            - StripPrefix=2
 
         # 用户服务路由
         - id: research-user
@@ -74,16 +98,25 @@ spring:
             - StripPrefix=1
             - name: JwtAuthFilter
 
-        # 成果服务路由
+        # 成果（结果）提交路由：/api/result/** → 项目服务 /result/**
+        - id: research-result
+          uri: lb://research-project
+          predicates:
+            - Path=/api/result/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+
+        # 成果统计与导出（与 result 同属项目服务）
         - id: research-achievement
-          uri: lb://research-achievement
+          uri: lb://research-project
           predicates:
             - Path=/api/achievement/**
           filters:
             - StripPrefix=1
             - name: JwtAuthFilter
 
-        # 搜索服务路由
+        # 搜索服务路由（公开检索 /search/public 可匿名）
         - id: research-search
           uri: lb://research-search
           predicates:
@@ -91,12 +124,23 @@ spring:
           filters:
             - StripPrefix=1
             - name: JwtAuthFilter
+              args:
+                ignorePaths: /api/search/public
 
         # 通知服务路由
         - id: research-notification
           uri: lb://research-notification
           predicates:
             - Path=/api/notification/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthFilter
+
+        # 系统管理（测试数据清理等，仅管理员）
+        - id: research-system
+          uri: lb://research-auth
+          predicates:
+            - Path=/api/system/**
           filters:
             - StripPrefix=1
             - name: JwtAuthFilter
@@ -109,10 +153,10 @@ spring:
             refillTokens: 10
             refillDuration: 1
 
-    # Sentinel 限流熔断（可选，如需使用需引入sentinel依赖）
+    # Sentinel 限流熔断（可选）
     sentinel:
       transport:
-        dashboard: localhost:8081
+        dashboard: localhost:8091
         port: 8719
       eager: true
       filter:
@@ -136,11 +180,12 @@ spring:
         max-idle: 10
         min-idle: 0
 
-# 日志配置
+# 日志配置（RouteDefinitionRouteLocator 设为 INFO 减少启动时大量 DEBUG）
 logging:
   level:
     com.research.gateway: debug
     org.springframework.cloud.gateway: debug
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"

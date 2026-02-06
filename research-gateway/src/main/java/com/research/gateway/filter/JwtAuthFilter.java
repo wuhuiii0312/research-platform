@@ -1,126 +1,131 @@
 package com.research.gateway.filter;
 
-import com.research.common.core.domain.CommonResult;
 import com.research.common.core.util.JwtUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.core.Ordered;
-import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * 网关JWT认证过滤器（改用@Autowired注入，避免构造器问题）
+ * 网关 JWT 鉴权：校验 token 并将 userId/username 写入请求头，供下游服务设置 SecurityUtils
  */
 @Slf4j
 @Component
-public class JwtAuthFilter implements GlobalFilter, Ordered {
+public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Config> {
 
-    // 改用@Autowired注入，兼容所有场景
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    // 空构造器（必须有，否则Spring无法创建实例）
-    public JwtAuthFilter() {
+    public JwtAuthFilter(JwtUtil jwtUtil) {
+        super(Config.class);
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
-        ServerHttpResponse response = exchange.getResponse();
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+            String path = request.getURI().getPath();
+            String method = request.getMethodValue();
 
-        // 跳过无需认证的路径
-        String path = request.getPath().toString();
-        if (skipAuth(path)) {
-            log.debug("跳过认证路径：{}", path);
-            return chain.filter(exchange);
-        }
-
-        // 获取令牌
-        String token = request.getHeaders().getFirst("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            log.warn("路径{}未携带有效令牌", path);
-            return buildUnauthorizedResponse(response, "未携带令牌或格式错误（需以Bearer开头）");
-        }
-
-        // 截取令牌
-        token = token.substring(7).trim();
-        if (token.isEmpty()) {
-            log.warn("路径{}令牌内容为空", path);
-            return buildUnauthorizedResponse(response, "令牌内容为空，拒绝访问");
-        }
-
-        // 验证令牌（即使JwtUtil是手动new的，也能正常调用方法）
-        try {
-            if (!jwtUtil.validateToken(token)) {
-                log.warn("路径{}令牌无效/过期", path);
-                return buildUnauthorizedResponse(response, "令牌无效或已过期，请重新登录");
+            List<String> ignorePaths = config.getIgnorePaths();
+            if (ignorePaths != null && !ignorePaths.isEmpty()) {
+                for (String raw : ignorePaths) {
+                    for (String ignorePath : splitIgnorePaths(raw)) {
+                        if (pathMatcher.match(ignorePath, path)) {
+                            return chain.filter(exchange);
+                        }
+                    }
+                }
             }
-        } catch (Exception e) {
-            log.error("验证令牌失败", e);
-            return buildUnauthorizedResponse(response, "令牌验证异常，请重新登录");
-        }
 
-        // 令牌验证通过，继续执行
-        return chain.filter(exchange);
+            String auth = request.getHeaders().getFirst("Authorization");
+            if (!StringUtils.hasText(auth) || !auth.startsWith("Bearer ")) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+            String token = auth.substring(7).trim();
+
+            Claims claims = jwtUtil.parseToken(token);
+            if (claims == null || claims.getExpiration() != null && claims.getExpiration().before(new java.util.Date())) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
+            Object userIdObj = claims.get("userId");
+            String username = claims.get("username", String.class);
+            String roleCode = claims.get("roleCode", String.class);
+            long userId = userIdObj instanceof Number ? ((Number) userIdObj).longValue() : 0L;
+            if (userId <= 0 || !StringUtils.hasText(username)) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
+            // 访客权限限制：拒绝创建/修改/提交类接口；对通知接口仅保留只读与标记已读能力
+            String role = StringUtils.hasText(roleCode) ? roleCode.trim().toUpperCase() : "VISITOR";
+            if ("VISITOR".equals(role)) {
+                // 通知相关接口单独处理：允许 GET 列表和 POST 标记已读，禁止删除与配置类写操作
+                if (pathMatcher.match("/api/notification/**", path) || pathMatcher.match("/notification/**", path)
+                        || pathMatcher.match("/api/notice/**", path) || pathMatcher.match("/notice/**", path)) {
+                    // DELETE/PUT/PATCH 一律禁止
+                    if ("DELETE".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "PATCH".equalsIgnoreCase(method)) {
+                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                        return exchange.getResponse().setComplete();
+                    }
+                    // 允许 GET 与用于标记已读的 POST，其余 POST 写操作在通知服务内部再做精细校验
+                } else {
+                    // 非通知接口：拦截写操作（POST/PUT/DELETE/PATCH），仅允许 GET
+                    if (!"GET".equalsIgnoreCase(method)) {
+                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                        return exchange.getResponse().setComplete();
+                    }
+                }
+            }
+
+            ServerHttpRequest mutated = request.mutate()
+                    .header("X-User-Id", String.valueOf(userId))
+                    .header("X-Username", username != null ? username : "")
+                    .header("X-Role", role)
+                    .build();
+            return chain.filter(exchange.mutate().request(mutated).build());
+        };
     }
 
-    /**
-     * 构建401未授权响应
-     */
-    private Mono<Void> buildUnauthorizedResponse(ServerHttpResponse response, String message) {
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        response.getHeaders().set("Content-Charset", StandardCharsets.UTF_8.name());
-
-        CommonResult<?> result = CommonResult.unauthorized(message);
-        try {
-            byte[] jsonBytes = objectMapper.writeValueAsBytes(result);
-            DataBuffer buffer = response.bufferFactory().wrap(jsonBytes);
-            return response.writeWith(Mono.just(buffer));
-        } catch (JsonProcessingException e) {
-            log.error("序列化响应失败", e);
-            byte[] textBytes = message.getBytes(StandardCharsets.UTF_8);
-            DataBuffer buffer = response.bufferFactory().wrap(textBytes);
-            return response.writeWith(Mono.just(buffer));
+    public static class Config {
+        private List<String> ignorePaths;
+        
+        public List<String> getIgnorePaths() {
+            return ignorePaths;
+        }
+        
+        public void setIgnorePaths(List<String> ignorePaths) {
+            this.ignorePaths = ignorePaths;
         }
     }
 
-    /**
-     * 跳过认证的路径（与网关路由 /api/auth/** 对应）
-     */
-    private boolean skipAuth(String path) {
-        return path.startsWith("/swagger-ui/")
-                || path.startsWith("/v3/api-docs/")
-                || path.startsWith("/actuator/health")
-                || path.equals("/api/auth/login")
-                || path.equals("/api/auth/register")
-                || path.equals("/api/auth/captcha")
-                || path.startsWith("/api/auth/login")
-                || path.startsWith("/api/auth/register")
-                || path.startsWith("/api/auth/captcha")
-                || path.equals("/api/user/login")
-                || path.startsWith("/api/user/login")
-                || path.startsWith("/api/user/register")
-                || path.startsWith("/api/user/captcha");
+    /** 将配置中的一条（可能为逗号分隔）拆成多个 path，并 trim */
+    private static List<String> splitIgnorePaths(String raw) {
+        if (raw == null || raw.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(raw.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public int getOrder() {
-        return -100;
+    public List<String> shortcutFieldOrder() {
+        return Arrays.asList("ignorePaths");
     }
 }

@@ -1,7 +1,12 @@
 package com.research.notification.service.impl;
 
+import cn.hutool.json.JSONObject;
+import com.research.notification.entity.Notification;
 import com.research.notification.handler.NotificationWebSocketHandler;
+import com.research.notification.mapper.NotificationMapper;
+import com.research.notification.model.NotificationEnums;
 import com.research.notification.model.NotificationMessage;
+import com.research.notification.model.SendNotificationRequest;
 import com.research.notification.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,8 +27,77 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private NotificationWebSocketHandler webSocketHandler;
 
-    @Autowired
+    @Autowired(required = false)
     private JavaMailSender mailSender;
+
+    @Autowired
+    private NotificationMapper notificationMapper;
+
+    @Override
+    public void sendNotification(SendNotificationRequest request) {
+        if (request == null || request.getTargetUserIds() == null || request.getTargetUserIds().isEmpty()) {
+            log.warn("跳过发送通知，接收人为空: {}", request);
+            return;
+        }
+        String priority = request.getPriority() != null ? request.getPriority() : NotificationEnums.Priority.NORMAL;
+
+        // 1. 按接收人落库
+        for (Long userId : request.getTargetUserIds()) {
+            Notification notification = new Notification();
+            notification.setUserId(userId);
+            // 兼容旧字段：按业务维度粗略映射 type
+            notification.setType(mapBizTypeToLegacyType(request.getBizType()));
+            notification.setBizType(request.getBizType());
+            notification.setBizId(request.getBizId());
+            notification.setProjectId(request.getProjectId());
+            notification.setPriority(priority);
+            notification.setActionType(request.getActionType());
+            notification.setExtra(request.getExtra());
+            notification.setTitle(request.getTitle());
+            notification.setContent(request.getContent());
+            notification.setReadFlag(0);
+            notification.setSendTime(LocalDateTime.now());
+            notification.setDelFlag(0);
+            notificationMapper.insert(notification);
+        }
+
+        // 2. WebSocket 推送
+        JSONObject data = new JSONObject();
+        data.set("title", request.getTitle());
+        data.set("content", request.getContent());
+        data.set("notificationType", request.getNotificationType());
+        data.set("relatedId", request.getRelatedId());
+        data.set("relatedType", request.getRelatedType());
+        data.set("bizType", request.getBizType());
+        data.set("bizId", request.getBizId());
+        data.set("projectId", request.getProjectId());
+        data.set("priority", priority);
+        data.set("actionType", request.getActionType());
+        data.set("extra", request.getExtra());
+        data.set("read", false);
+
+        NotificationMessage message = new NotificationMessage(NotificationMessage.TYPE_NOTIFICATION, data);
+        for (Long userId : request.getTargetUserIds()) {
+            webSocketHandler.sendToUser(userId.toString(), message);
+        }
+    }
+
+    private String mapBizTypeToLegacyType(String bizType) {
+        if (bizType == null) {
+            return null;
+        }
+        switch (bizType) {
+            case NotificationEnums.BizType.TASK:
+                return "task";
+            case NotificationEnums.BizType.DOCUMENT:
+                return "document";
+            case NotificationEnums.BizType.PROJECT:
+            case NotificationEnums.BizType.RESULT:
+            case NotificationEnums.BizType.SYSTEM:
+            default:
+                return "system";
+        }
+    }
 
     @Override
     public void sendTaskAssignedNotification(Long taskId, String taskName,
@@ -30,14 +105,19 @@ public class NotificationServiceImpl implements NotificationService {
         String title = "新任务分配";
         String content = String.format("您被分配到新任务：%s", taskName);
 
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.TASK_ASSIGNED,
-                taskId.toString(), "TASK"
-        );
-
-        // WebSocket通知
-        webSocketHandler.sendToUser(assigneeId.toString(), message);
+        // 持久化 + WebSocket
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(Arrays.asList(assigneeId));
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.TASK);
+        request.setBizId(taskId);
+        request.setPriority(NotificationEnums.Priority.HIGH);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.TASK_ASSIGNED);
+        request.setRelatedId(taskId.toString());
+        request.setRelatedType("TASK");
+        sendNotification(request);
 
         // 邮件通知
         sendEmailNotification(assigneeId, title, content);
@@ -52,16 +132,18 @@ public class NotificationServiceImpl implements NotificationService {
         String title = "任务更新";
         String content = String.format("任务【%s】已被%s更新", taskName, updaterName);
 
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.TASK_UPDATED,
-                taskId.toString(), "TASK"
-        );
-
-        // 发送给相关用户
-        for (Long userId : relatedUserIds) {
-            webSocketHandler.sendToUser(userId.toString(), message);
-        }
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(relatedUserIds);
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.TASK);
+        request.setBizId(taskId);
+        request.setPriority(NotificationEnums.Priority.NORMAL);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.TASK_UPDATED);
+        request.setRelatedId(taskId.toString());
+        request.setRelatedType("TASK");
+        sendNotification(request);
 
         log.info("发送任务更新通知: taskId={}, relatedUsers={}", taskId, relatedUserIds);
     }
@@ -73,14 +155,18 @@ public class NotificationServiceImpl implements NotificationService {
         String title = "项目邀请";
         String content = String.format("您被%s邀请加入项目【%s】", inviterName, projectName);
 
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.PROJECT_INVITED,
-                projectId.toString(), "PROJECT"
-        );
-
-        // WebSocket通知
-        webSocketHandler.sendToUser(inviteeId.toString(), message);
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(Arrays.asList(inviteeId));
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.PROJECT);
+        request.setBizId(projectId);
+        request.setPriority(NotificationEnums.Priority.NORMAL);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.PROJECT_INVITED);
+        request.setRelatedId(projectId.toString());
+        request.setRelatedType("PROJECT");
+        sendNotification(request);
 
         // 邮件通知
         sendEmailNotification(inviteeId, title, content);
@@ -95,16 +181,18 @@ public class NotificationServiceImpl implements NotificationService {
         String title = "文档共享";
         String content = String.format("%s与您共享了文档【%s】", sharerName, documentName);
 
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.DOCUMENT_SHARED,
-                documentId.toString(), "DOCUMENT"
-        );
-
-        // 发送给所有被共享的用户
-        for (Long userId : sharedUserIds) {
-            webSocketHandler.sendToUser(userId.toString(), message);
-        }
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(sharedUserIds);
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.DOCUMENT);
+        request.setBizId(documentId);
+        request.setPriority(NotificationEnums.Priority.NORMAL);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.DOCUMENT_SHARED);
+        request.setRelatedId(documentId.toString());
+        request.setRelatedType("DOCUMENT");
+        sendNotification(request);
 
         log.info("发送文档共享通知: documentId={}, sharedUsers={}", documentId, sharedUserIds);
     }
@@ -116,35 +204,39 @@ public class NotificationServiceImpl implements NotificationService {
         String title = "评论回复";
         String content = String.format("%s回复了您的评论：%s", replierName, replyContent);
 
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.COMMENT_REPLIED,
-                replyId.toString(), "COMMENT"
-        );
-
-        // 发送给评论者
-        webSocketHandler.sendToUser(commenterId.toString(), message);
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(Arrays.asList(commenterId));
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.SYSTEM);
+        request.setBizId(commentId);
+        request.setPriority(NotificationEnums.Priority.NORMAL);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.COMMENT_REPLIED);
+        request.setRelatedId(replyId.toString());
+        request.setRelatedType("COMMENT");
+        sendNotification(request);
 
         log.info("发送评论回复通知: commentId={}, replierId={}", commentId, replierId);
     }
 
     @Override
     public void sendSystemAnnouncement(String title, String content, List<Long> targetUserIds) {
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.SYSTEM_ANNOUNCEMENT,
-                null, "SYSTEM"
-        );
-
         if (targetUserIds == null || targetUserIds.isEmpty()) {
-            // 广播给所有用户
-            webSocketHandler.broadcast(message);
-        } else {
-            // 发送给指定用户
-            for (Long userId : targetUserIds) {
-                webSocketHandler.sendToUser(userId.toString(), message);
-            }
+            log.warn("系统公告当前实现仅支持指定用户推送，targetUserIds 为空时跳过发送: title={}", title);
+            return;
         }
+
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(targetUserIds);
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.SYSTEM);
+        request.setPriority(NotificationEnums.Priority.NORMAL);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.SYSTEM_ANNOUNCEMENT);
+        request.setRelatedType("SYSTEM");
+        sendNotification(request);
 
         log.info("发送系统公告: title={}, targetUsers={}", title, targetUserIds);
     }
@@ -155,13 +247,23 @@ public class NotificationServiceImpl implements NotificationService {
         String title = "截止日期提醒";
         String content = String.format("任务【%s】还有%d天截止（%s）", taskName, daysLeft, deadline);
 
-        NotificationMessage message = NotificationMessage.notification(
-                title, content,
-                NotificationMessage.NotificationType.DEADLINE_REMINDER,
-                taskId.toString(), "TASK"
-        );
-
-        webSocketHandler.sendToUser(assigneeId.toString(), message);
+        SendNotificationRequest request = new SendNotificationRequest();
+        request.setTargetUserIds(Arrays.asList(assigneeId));
+        request.setTitle(title);
+        request.setContent(content);
+        request.setBizType(NotificationEnums.BizType.TASK);
+        request.setBizId(taskId);
+        request.setPriority(NotificationEnums.Priority.HIGH);
+        request.setActionType(NotificationEnums.ActionType.VIEW_DETAIL);
+        request.setNotificationType(NotificationMessage.NotificationType.DEADLINE_REMINDER);
+        request.setRelatedId(taskId.toString());
+        request.setRelatedType("TASK");
+        // 在 extra 中附带剩余天数与截止日期
+        JSONObject extra = new JSONObject();
+        extra.set("deadline", deadline);
+        extra.set("daysLeft", daysLeft);
+        request.setExtra(extra.toString());
+        sendNotification(request);
 
         log.info("发送截止日期提醒: taskId={}, assigneeId={}, daysLeft={}",
                 taskId, assigneeId, daysLeft);
@@ -171,6 +273,11 @@ public class NotificationServiceImpl implements NotificationService {
      * 发送邮件通知
      */
     private void sendEmailNotification(Long userId, String title, String content) {
+        if (mailSender == null) {
+            // 未配置邮件发送时直接跳过，不影响主流程
+            log.debug("未配置 JavaMailSender，跳过邮件通知: userId={}, title={}", userId, title);
+            return;
+        }
         try {
             // 根据用户ID获取邮箱
             String email = getUserEmail(userId);

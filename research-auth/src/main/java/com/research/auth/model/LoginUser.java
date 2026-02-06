@@ -19,4 +19,6 @@ public class LoginUser {
     private String token;
     private LocalDateTime loginTime;
     private LocalDateTime expireTime;
+    /** 五位数字邀请码，供负责人邀请入项目 */
+    private String inviteCode;
 }

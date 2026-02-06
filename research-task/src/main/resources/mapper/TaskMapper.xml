@@ -35,12 +35,19 @@
 
     <select id="selectTaskPage" resultType="com.research.task.entity.Task">
         SELECT t.*, p.name as project_name,
-               u1.name as assignee_name, u2.name as reporter_name
+               u1.username as assignee_name, u2.username as reporter_name
         FROM task t
         LEFT JOIN project p ON t.project_id = p.id
         LEFT JOIN sys_user u1 ON t.assignee_id = u1.id
         LEFT JOIN sys_user u2 ON t.reporter_id = u2.id
         WHERE t.del_flag = 0
+        <!-- 仅返回当前用户参与的项目下的任务（项目成员或负责人） -->
+          AND t.project_id IN (
+              SELECT pm.project_id
+              FROM project_member pm
+              WHERE pm.user_id = #{userId}
+                AND pm.status = 1
+          )
         <if test="query.projectId != null">
             AND t.project_id = #{query.projectId}
         </if>
@@ -61,7 +68,7 @@
 
     <select id="selectTaskDetail" resultMap="TaskDetailMap">
         SELECT t.*, p.name as project_name,
-               u1.name as assignee_name, u2.name as reporter_name
+               u1.username as assignee_name, u2.username as reporter_name
         FROM task t
         LEFT JOIN project p ON t.project_id = p.id
         LEFT JOIN sys_user u1 ON t.assignee_id = u1.id
@@ -81,7 +88,7 @@
     </select>
 
     <select id="selectProjectTasks" resultType="com.research.task.entity.Task">
-        SELECT t.*, u.name as assignee_name
+        SELECT t.*, u.username as assignee_name
         FROM task t
         LEFT JOIN sys_user u ON t.assignee_id = u.id
         WHERE t.project_id = #{projectId} AND t.del_flag = 0
@@ -101,7 +108,7 @@
     </select>
 
     <select id="selectSubTasks" resultType="com.research.task.entity.Task">
-        SELECT t.*, u.name as assignee_name
+        SELECT t.*, u.username as assignee_name
         FROM task t
         LEFT JOIN sys_user u ON t.assignee_id = u.id
         WHERE t.parent_id = #{parentId} AND t.del_flag = 0

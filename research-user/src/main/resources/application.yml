@@ -1,24 +1,25 @@
 server:
   port: 8086
-
 spring:
   application:
     name: research-user
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8080
-        namespace: public
+        server-addr: localhost:8848  # 修正为Nacos默认端口
+        namespace: research-platform
+        group: DEFAULT_GROUP  # 补充group，与网关一致
+        fail-fast: false
+        register-enabled: true  # 强制注册
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/research_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-
 jwt:
   secret: project-secret-key-1234567890
   expire: 7200
-
 logging:
   level:
     com.research.user: debug
+    com.alibaba.nacos: info

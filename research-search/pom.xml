@@ -39,6 +39,11 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
+        <!-- Swagger API 文档（@Api、@ApiOperation） -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -48,6 +53,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.research.search.ResearchSearchApplication</mainClass>
+                    <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
                 </configuration>
             </plugin>
         </plugins>

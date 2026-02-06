@@ -8,6 +8,7 @@ import com.research.project.model.ProjectQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,4 +22,14 @@ public interface ProjectMapper extends BaseMapper<Project> {
     Project selectProjectDetail(@Param("id") Long id);
 
     Map<String, Object> selectProjectStatistics(@Param("leaderId") Long leaderId);
+
+    int countTaskByProjectId(@Param("projectId") Long projectId);
+
+    int countDocumentByProjectId(@Param("projectId") Long projectId);
+
+    /** 统计公开项目的公开文档数量 */
+    int countPublicDocumentsByProjectIds(@Param("projectIds") List<Long> projectIds);
+
+    /** 立项审核列表：负责人可见，带申请人姓名 */
+    IPage<Project> selectAuditPage(Page<Project> page, @Param("leaderId") Long leaderId, @Param("statuses") List<String> statuses);
 }

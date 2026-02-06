@@ -44,6 +44,14 @@ public class TaskController {
         return taskService.deleteTask(id);
     }
 
+    @Log(title = "按项目ID批量删除任务", businessType = BusinessType.DELETE)
+    @PostMapping("/delete/byProjectId")
+    @ApiOperation("按项目ID批量删除任务（项目解散时调用）")
+    public CommonResult<?> deleteTasksByProjectId(@RequestBody java.util.Map<String, Object> params) {
+        Long projectId = ((Number) params.get("projectId")).longValue();
+        return taskService.deleteTasksByProjectId(projectId);
+    }
+
     @GetMapping("/detail/{id}")
     @ApiOperation("获取任务详情")
     public CommonResult<?> getTaskDetail(@PathVariable Long id) {
